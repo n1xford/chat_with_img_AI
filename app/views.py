@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
 
 from project.settings import API_KEY
 from .forms import PromptForm
@@ -10,8 +11,15 @@ client = openai.OpenAI(api_key=API_KEY)
 
 
 def home(request):
-    response_text = None
-    response_image = None
+    if request.is_authenticaton:
+        QueryHistory.object.create(
+            user=request.user,
+            query=query,
+            response_text=None,
+            response_image = None,
+        )
+
+
 
     if request.method == 'POST':
         form = PromptForm(request.POST)
@@ -33,7 +41,7 @@ def home(request):
         # model 'dall-e-3'
         image_result = client.images.generate(
             model="dall-e-3",
-            prompt='cat in pool'
+            prompt='owl in pool with hat and title "MAMA"'
         )
 
         response_image = image_result.data[0].url
@@ -56,12 +64,12 @@ def home(request):
         'response_image': response_image,
     })
 
-def register_view(request):
+def signup(request):
     if request.method == 'POST':
-        form = RegisterForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')  # або інша сторінка
+            return redirect('login')
     else:
-        form = RegisterForm()
-    return render(request, 'register.html', {'form': form})
+        form = UserCreationForm()
+    return render(request, 'registration/signup.html',{'from': form})

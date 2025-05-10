@@ -20,6 +20,13 @@
         </nav>
     </div>
 
+    {% if user.is_authenticated %}
+        Привіт, {{ user.username }} | <a href="{% url 'logout' %}">Вийти</a>
+    {% else %}
+        <a href="{% url 'logout' %}">Увійти</a> | <a href="{% url 'signup' %}">Зареєструватися</a>
+    {% endif %}
+    <hr>
+
     {% block content %}{% endblock %}
 
 
